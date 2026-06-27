@@ -5,6 +5,32 @@ A solution to patch vGPU_Unlock into nvidia driver, including possibility to cre
 
 This repository contains a submodule, so please clone this project recursively, i.e. using `git clone --recursive` command.
 
+## Fork note: Linux 7.0 / Proxmox VE 9 support
+
+This fork is **upstream `benjamindoron/vGPU-Unlock-Patcher` + one extra patch** that fixes the
+kernel module build on **Linux 7.0** (the VMA refcount / `__is_vma_write_locked()` API change):
+`patches/vgpu-kvm-support-v7.0-vma-refcount-rename.patch`. It is gated behind
+`#ifdef VM_REFCNT_EXCLUDE_READERS_FLAG`, so it builds on both pre- and post-7.0 kernels.
+
+**Tested working as-is** with this exact combination:
+
+- Driver: merged **`580.126.08-vgpu-kvm`** + **`580.126.09-grid`** (the versions hardcoded in `patch.sh`)
+- Host: **Proxmox VE 9.2.3**, kernel **`7.0.2-6-pve`**
+- GPU: **GeForce RTX 2080 Ti (TU102)**
+- Result: driver builds, `nvidia-smi`, `nvidia-vgpu-mgr`, and mdev vGPU profile allocation all OK.
+
+For that same driver/GPU it works out of the box, but note the patcher is **not** a ready-made
+driver — you must still:
+
+1. Clone **recursively** (`git clone --recursive`) — there is a submodule.
+2. **Download the two NVIDIA `.run` files yourself** (they are licensed and not redistributable):
+   `NVIDIA-Linux-x86_64-580.126.08-vgpu-kvm.run` and `NVIDIA-Linux-x86_64-580.126.09-grid.run`,
+   and place them in the repo directory. The versions must match the ones in `patch.sh`.
+3. Run `./patch.sh general-merge`, then `./nvidia-installer --dkms -m=kernel`.
+
+A **different driver version, GPU, or a kernel newer than `7.0.2-6-pve` is not guaranteed** — like
+the original patcher, those may need their own patches.
+
 ## Usage
 
 1. download original vgpu kvm `.run` files as available in a grid package `.zip` release, use the version matching the name of chosen branch of this project (the latest one is recommended)
