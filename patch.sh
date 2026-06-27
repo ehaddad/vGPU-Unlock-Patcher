@@ -620,6 +620,7 @@ $TDMABUFEXPORT && {
 }
 $DO_VGPU && applypatchx ${TARGET} vgpu-kvm-support-v6.18-namespaced-variables.patch
 $DO_VGPU && applypatchx ${TARGET} vgpu-kvm-support-v6.19-pfn_address_space.patch
+applypatchx ${TARGET} vgpu-kvm-support-v7.0-vma-refcount-rename.patch    # kernel 7.0 VMA refcount rename
 $DO_VGPU && applypatchx ${TARGET} vgpu-kvm-fault-path-acquires-mmap_lock.patch
 $DO_VGPU && applypatchx ${TARGET} vgpu-kvm-optional-vgpu-v2.patch
 
